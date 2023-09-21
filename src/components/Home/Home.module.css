@@ -1,0 +1,241 @@
+.homeCont {
+    width: 100vw;
+    height: 100vh;
+    /* border:2px solid orangered; */
+    position: relative;
+}
+
+.searchCont {
+    width: 23vw;
+    height: 7vh;
+    /* border:2px solid blue; */
+    position: absolute;
+    left: 40%;
+    top: 3%;
+}
+
+.searchCont input {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f6f8 !important;
+    border: 1px solid #7064e5;
+    outline: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    text-indent: 10px;
+}
+
+
+
+
+
+/* Product details */
+.productCont {
+    width: 65vw;
+    height: auto;
+    /* border:2px solid blue; */
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 20%;
+    top: 15%;
+}
+
+.productDetails {
+    width: 20vw;
+    height: 75vh;
+    border: 1px solid gray;
+    box-shadow: 0 2px 8px 0 rgba(64, 77, 148, .4);
+    margin: 10px;
+    border-radius: 10px;
+    position: relative;
+    transition: 2s ease-in-out;
+}
+
+.productImg {
+    width: 80%;
+    height: 50%;
+    /* border:2px solid red; */
+    position: absolute;
+    left: 10%;
+    top: 10%;
+}
+
+
+.productImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.productName {
+    width: 80%;
+    height: 8vh;
+    /* border:2px solid blue; */
+    position: absolute;
+    font-size: 1.3rem;
+    bottom: 25%;
+    left: 10%;
+}
+
+.productPrice {
+    width: 80%;
+    height: 5vh;
+    /* border:2px solid black; */
+    font-size: 1.2rem;
+    color: #224957;
+    display: flex;
+    font-weight: bold;
+   position: absolute;
+    bottom: 15%;
+    left: 10%;
+}
+
+.prodCnt{
+    width:38%;
+    height:70%;
+    /* border:2px solid red; */
+    display: flex;
+    justify-content: space-between;
+   position: absolute;
+    right:0%;
+
+}
+.prodCnt span{
+    font-size:1.5rem;
+    position: absolute;
+    left:40%;
+    top:-20%;
+}
+.prodCnt img{
+    width:25px;
+    height:25px;
+}
+
+.prodCnt img:hover{
+    cursor: pointer;
+}
+.productButton {
+    width: 80%;
+    height: 8vh;
+    /* border:2px solid black; */
+    border-radius: 10px;
+    position: absolute;
+    bottom: 2%;
+    left: 10%;
+}
+
+.productButton button {
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    border: none;
+    background-color: #7064e5;
+    color: white;
+}
+.productButton button:hover{
+    cursor: pointer;
+    background-color: #f4f6f8;
+    color:#7064e5;
+    border: 1px solid gray;
+
+}
+
+/* Cart styles */
+.cartProductImg {
+    width: 80%;
+    height: 50%;
+    /* border:2px solid red; */
+    position: absolute;
+    left: 10%;
+    top:2%;
+}
+.cartProductImg img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cartProductDetails{
+    width: 20vw;
+    height: 62vh;
+    border: 1px solid gray;
+    box-shadow: 0 2px 8px 0 rgba(64, 77, 148, .4);
+    margin: 10px;
+    border-radius: 10px;
+    position: relative;
+    transition: 2s ease-in-out;
+}
+
+.cartProductPriceCont{
+    width:15vw;
+    height:15vh;
+    border:1px solid gray;
+    background-color:#f4f6f8;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    top:30%;
+    left:1%;
+}
+.cartProductPriceCont h3{
+    color:#224957;
+    /* text-align: center; */
+}
+.cartProductPriceCont button{
+    font-size:1.2rem;
+    width:50%;
+    height:28%;
+    border-radius: 5px;
+    border: none;
+    background-color: #7064e5;
+    color: white;
+}
+.cartProductPriceCont button:hover{
+    background-color: #f4f6f8;
+    color:#7064e5;
+    cursor: pointer;
+    border: 1px solid gray;
+}
+
+.cartProductButton {
+    width: 80%;
+    height: 7vh;
+    /* border:2px solid black; */
+    border-radius: 10px;
+    position: absolute;
+    bottom: 2%;
+    left: 10%;
+}
+.cartProductButton button {
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 0, 0, 0.749);
+    color:#f4f6f8;
+   
+}
+.cartProductButton button:hover{
+    cursor: pointer;
+    background-color: #f4f6f8;
+    color:#f14444;
+    border: 1px solid red;
+
+}
+
+.loader{
+    height: 300px;
+    /* border:2px solid red; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position:absolute;
+    top:30%;
+    left:50%;
+    
+}
