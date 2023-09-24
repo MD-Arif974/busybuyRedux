@@ -16,14 +16,15 @@ import {
 
 
 } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { homeSelector } from "./redux/reducers/homeReducers";
 
 
 
 function App() {
   
-    
-   
- 
+
+  let auth = sessionStorage.getItem("email");
   const router = createBrowserRouter([
     {
       path: "/",
@@ -34,11 +35,11 @@ function App() {
         { index: true, element: <Home />},
         {
           path: "order",
-          element:  <Order /> 
+          element: auth ? <Order /> : <SignIn />
         },
         {
           path: "cart",
-          element:  <Cart />
+          element: auth ?   <Cart /> : <Cart />
         },
         {
           path: "signup",

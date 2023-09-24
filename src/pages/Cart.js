@@ -11,10 +11,20 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseInit";
 import { useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { homeSelector } from "../redux/reducers/homeReducers";
 
 const Cart = () => {
   const { carts, totalCartsPrice } = useSelector(cartSelector);
+  const {user}  = useSelector(homeSelector);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  let auth = sessionStorage.getItem("email");
+  
+  if(!auth) {
+    return <Navigate to ='/signin' replace = {true} />
+  }
 
   const incrementQtyToDB = async (id) => {
     dispatch(cartActions.incrementProdCnt(id));
@@ -91,7 +101,8 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    getCartsProd();
+    if(auth)
+     getCartsProd();
   }, []);
 
   return (
