@@ -8,6 +8,7 @@ import {db} from '../../firebaseInit';
 import Spinner from 'react-spinner-material';
 
 import {collection,getDocs,doc,setDoc,updateDoc} from 'firebase/firestore';
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const Home = () => {
   const {products,categoryArr,filterProdName,filterArr} = useSelector(homeSelector);
@@ -15,14 +16,29 @@ const Home = () => {
   
   const dispatch = useDispatch();
   const [loading,setLoading] = useState(false);
+  const navigate = useNavigate();
 
 
 
-  // console.log("carts",carts);
+
+   
+  const addItemsToDb = async(e,prod,id) => {
+
+
     
-  const addItemsToDb = async(prod,id) => {
     let email = sessionStorage.getItem('email');
-    dispatch(cartActions.add([prod,id]));
+   
+    if(!email) {
+     
+         navigate('/signin');
+    }
+    else{
+
+   
+
+    e.target.innerText = "Adding";
+    setTimeout(async() => {
+      dispatch(cartActions.add([prod,id]));
      let ind = carts.findIndex((item) => item.id === prod.id);
    
      if(ind >=0) {
@@ -43,6 +59,9 @@ const Home = () => {
        
       });
      }
+     e.target.innerText = "Add to Cart";
+    }, 1000);
+  }
   }
 
 
@@ -103,9 +122,15 @@ const Home = () => {
               <span>&#8377; {item.price}</span>&nbsp;
             </div>
 
-            <div className={styles.productButton} onClick={() => addItemsToDb(item,item.id)}>
-              <button>Add to Cart</button>
-            </div>
+           
+              
+              <div className={styles.productButton} onClick={(e) => addItemsToDb(e,item,item.id)}>
+                <button>Add to Cart</button>
+               </div>
+           
+              
+               
+        
           </div>
             
           ))
@@ -130,9 +155,16 @@ const Home = () => {
               <span>&#8377; {item.price}</span>&nbsp;
             </div>
 
-            <div className={styles.productButton} onClick={() => addItemsToDb(item,item.id)}>
-              <button>Add to Cart</button>
-            </div>
+            
+           
+              
+              <div className={styles.productButton} onClick={(e) => addItemsToDb(e,item,item.id)}>
+                <button>Add to Cart</button>
+               </div>
+           
+            
+               
+         
           </div>
             
           ))

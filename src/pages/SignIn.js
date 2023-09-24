@@ -20,16 +20,22 @@ const SignIn = () => {
 
   const handleSignIn = (e) => {
     e.preventDefault();
-
-    const auth = getAuth();
+    
+    if(emailRef.current.value && passwordRef.current.value)
+     e.target.innerText = "...";
+    setTimeout(() => {
+      const auth = getAuth();
+     
     signInWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value)
       .then((userCredential) => {
         // Signed in
+        
           let name = localStorage.getItem("name");
         sessionStorage.setItem("email",emailRef.current.value);
         dispatch(authActions.login(name));
         emailRef.current.value = "";
         passwordRef.current.value = "";
+        e.target.innerText = "Sign In";
         navigate('/');
         
       })
@@ -37,19 +43,20 @@ const SignIn = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
       });
+    }, 1000);
   };
 
   return (
     <>
       <div className={styles.signInCont}>
         <h2>Sign In</h2>
-        <div className={styles.signInForm}>
-          <input type="email" ref={emailRef} placeholder="Enter Email" />
+        <form className={styles.signInForm} >
+          <input type="email" ref={emailRef} placeholder="Enter Email" required/>
           <br />
-          <input type="password" ref={passwordRef} placeholder="Enter Password" />
+          <input type="password" ref={passwordRef} placeholder="Enter Password" required/>
           <br />
           <button onClick={(e) => handleSignIn(e)}>Sign in</button>
-        </div>
+        </form>
 
         <Link
           to="/signup"

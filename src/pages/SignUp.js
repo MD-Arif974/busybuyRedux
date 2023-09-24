@@ -14,11 +14,15 @@ const SignUp = () => {
 
   const handleSignUp = (e) => {
     e.preventDefault();
-
-    const auth = getAuth();
+    if(nameRef.current.value && emailRef.current.value && passwordRef.current.value)
+     e.target.innerText = "...";
+    setTimeout(() => {
+      
+      const auth = getAuth();
     createUserWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value)
       .then(async(userCredential) => {
         // Signed Up
+      
         const user = userCredential.user;
         await setDoc(doc(db,"users",emailRef.current.value),{
             email:emailRef.current.value,
@@ -31,6 +35,7 @@ const SignUp = () => {
             emailRef.current.value = "";
             nameRef.current.value = "";
             passwordRef.current.value = "";
+            e.target.innerText = "Sign Up";
             navigate('/signin')
       })
       .catch((error) => {
@@ -38,6 +43,7 @@ const SignUp = () => {
         const errorMessage = error.message;
         console.log(errorCode,"...",errorMessage);
       });
+    }, 1000);
 
   };
 
@@ -45,15 +51,16 @@ const SignUp = () => {
     <>
       <div className={styles.signUpCont}>
         <h2>Sign Up</h2>
-        <form>
-          <input type="text" ref={nameRef} placeholder="Enter Name" />
+        <form >
+          <input type="text" ref={nameRef} placeholder="Enter Name" required/>
           <br />
-          <input type="email" ref={emailRef} placeholder="Enter Email" />
+          <input type="email" ref={emailRef} placeholder="Enter Email" required/>
           <br />
           <input
             type="password"
             ref={passwordRef}
             placeholder="Enter Password"
+            required
           />
           <br />
           <button onClick={(e) => handleSignUp(e)}>Sign Up</button>

@@ -16,9 +16,8 @@ import { homeSelector } from "../redux/reducers/homeReducers";
 
 const Cart = () => {
   const { carts, totalCartsPrice } = useSelector(cartSelector);
-  const {user}  = useSelector(homeSelector);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const dispatch = useDispatch();
+
 
   let auth = sessionStorage.getItem("email");
   
