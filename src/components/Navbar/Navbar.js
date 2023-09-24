@@ -10,7 +10,7 @@ const Navbar = () => {
   const { user } = useSelector(authSelector);
   const dispatch = useDispatch();
    
-  console.log("line 13",user);
+ 
   const getName = async () => {
     const email = sessionStorage.getItem("email");
     const querySnapshot = await getDocs(collection(db, "users"));
@@ -30,7 +30,7 @@ const Navbar = () => {
     e.preventDefault();
     sessionStorage.removeItem("email");
     dispatch(authActions.logout());
-    console.log("line 33",user);
+    
   };
 
   return (

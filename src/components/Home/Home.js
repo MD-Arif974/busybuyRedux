@@ -2,18 +2,51 @@ import styles from "./Home.module.css";
 import Filter from "../Filter/Filter";
 import { useDispatch, useSelector } from "react-redux";
 import { homeActions,homeSelector } from "../../redux/reducers/homeReducers";
+import { cartActions,cartSelector } from "../../redux/reducers/cartReducers";
 import { useEffect, useState } from "react";
 import {db} from '../../firebaseInit';
 import Spinner from 'react-spinner-material';
 
-import {collection,getDocs} from 'firebase/firestore';
+import {collection,getDocs,doc,setDoc,updateDoc} from 'firebase/firestore';
 
 const Home = () => {
-  const {products} = useSelector(homeSelector);
+  const {products,categoryArr,filterProdName,filterArr} = useSelector(homeSelector);
+  const {carts} = useSelector(cartSelector);
+  
   const dispatch = useDispatch();
   const [loading,setLoading] = useState(false);
+
+
+
+  // console.log("carts",carts);
     
-  
+  const addItemsToDb = async(prod,id) => {
+    let email = sessionStorage.getItem('email');
+    dispatch(cartActions.add([prod,id]));
+     let ind = carts.findIndex((item) => item.id === prod.id);
+   
+     if(ind >=0) {
+      const cartsProdRef = doc(db, "users", email,"carts",id);
+
+      await updateDoc(cartsProdRef, {
+        qty:carts[ind].qty + 1
+      });
+     }
+     else{
+      await setDoc(doc(db, "users",email,"carts",id), {
+        name: prod.name,
+        price:prod.price,
+        qty:1,
+        icon:prod.icon,
+        id,
+        category:prod.category
+       
+      });
+     }
+  }
+
+
+
   const getProducts = async() => {
        setLoading(true);
        const querySnapshot = await getDocs(collection(db,"products"));
@@ -23,7 +56,8 @@ const Home = () => {
        })
        
        
-       dispatch(homeActions.setupInitialState(arr));
+       dispatch(homeActions.setupInitialState([arr,75000]));
+       
        setLoading(false);
   }
   useEffect(() => {
@@ -44,14 +78,22 @@ const Home = () => {
           <input
             type="text"
             placeholder="Search by Name..."
-           
+            onChange={(e) => dispatch(homeActions.filterProductsByName(e.target.value))}
           />
         </div>
         { products.length > 0 ? <Filter /> : null}
-        <div className={styles.productCont}>
+
+        {
+          categoryArr.length > 0 ?
+
+          <>
+              <div className={styles.productCont}>
           {
 
-          products.map((item,i) => (
+          categoryArr.filter((item) => {
+                 if(filterProdName.length === 0) return true;
+                 if(item.name.toLowerCase().includes(filterProdName.toLowerCase())) return true;
+          }).map((item,i) => (
            <div className={styles.productDetails} key={item.id} >
             <div className={styles.productImg}>
               <img  src={item.icon} alt = {item.name}/>
@@ -61,7 +103,7 @@ const Home = () => {
               <span>&#8377; {item.price}</span>&nbsp;
             </div>
 
-            <div className={styles.productButton}>
+            <div className={styles.productButton} onClick={() => addItemsToDb(item,item.id)}>
               <button>Add to Cart</button>
             </div>
           </div>
@@ -70,6 +112,36 @@ const Home = () => {
           
             }
         </div>
+          </>
+          :
+          <div className={styles.productCont}>
+          {
+
+          filterArr.filter((item) => {
+            if(filterProdName.length === 0) return true;
+            if(item.name.toLowerCase().includes(filterProdName.toLowerCase())) return true;
+     }).map((item,i) => (
+           <div className={styles.productDetails} key={item.id} >
+            <div className={styles.productImg}>
+              <img  src={item.icon} alt = {item.name}/>
+            </div>
+            <div className={styles.productName}>{item.name}</div>
+            <div className={styles.productPrice}>
+              <span>&#8377; {item.price}</span>&nbsp;
+            </div>
+
+            <div className={styles.productButton} onClick={() => addItemsToDb(item,item.id)}>
+              <button>Add to Cart</button>
+            </div>
+          </div>
+            
+          ))
+          
+            }
+        </div>
+
+        }
+        
     
       </div>
     </>
