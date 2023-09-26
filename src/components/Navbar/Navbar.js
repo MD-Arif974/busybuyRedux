@@ -1,5 +1,5 @@
 import styles from "./Navbar.module.css";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { authSelector, authActions } from "../../redux/reducers/authReducers";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -9,8 +9,9 @@ import { db } from "../../firebaseInit";
 const Navbar = () => {
   const { user } = useSelector(authSelector);
   const dispatch = useDispatch();
-   
- 
+
+  let auth = sessionStorage.getItem("email");
+
   const getName = async () => {
     const email = sessionStorage.getItem("email");
     const querySnapshot = await getDocs(collection(db, "users"));
@@ -27,10 +28,8 @@ const Navbar = () => {
   }, []);
 
   const handleLogOut = (e) => {
-    e.preventDefault();
     sessionStorage.removeItem("email");
     dispatch(authActions.logout());
-    
   };
 
   return (
@@ -41,7 +40,7 @@ const Navbar = () => {
         </Link>
 
         <Link to="/">
-          <div className={`${user ? styles.home : styles.homeNotSignin}`}>
+          <div className={`${auth ? styles.home : styles.homeNotSignin}`}>
             <img src="data:image/png;base64,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" />
             <span>Home</span>
           </div>
@@ -57,7 +56,7 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {user ? (
+        {auth ? (
           <>
             <Link to="/order">
               <div className={styles.order}>
@@ -81,7 +80,7 @@ const Navbar = () => {
           </>
         ) : null}
 
-        {user ? (
+        {auth ? (
           <div className={styles.userName}>
             <img
               src="https://cdn-icons-png.flaticon.com/128/2202/2202112.png"

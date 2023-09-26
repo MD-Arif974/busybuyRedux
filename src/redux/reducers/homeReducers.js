@@ -71,7 +71,7 @@ const homeSlice = createSlice({
      
     },
     filterProductsByName:(state,action) => {
-        console.log("name",action.payload);
+       
          state.filterProdName = action.payload;
     },
     filterProductsByPrice:(state,action) => {
@@ -102,8 +102,8 @@ const homeSlice = createSlice({
   },
 });
 
-export const homeReducers = homeSlice.reducer;
+export const homeReducer = homeSlice.reducer;
 
 export const homeActions = homeSlice.actions;
 
-export const homeSelector = (state) => state.homeReducers;
+export const homeSelector = (state) => state.homeReducer;

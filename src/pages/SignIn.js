@@ -30,9 +30,9 @@ const SignIn = () => {
       .then((userCredential) => {
         // Signed in
         
-          let name = localStorage.getItem("name");
+         
         sessionStorage.setItem("email",emailRef.current.value);
-        dispatch(authActions.login(name));
+       
         emailRef.current.value = "";
         passwordRef.current.value = "";
         e.target.innerText = "Sign In";

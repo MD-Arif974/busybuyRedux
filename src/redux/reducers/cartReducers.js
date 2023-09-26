@@ -4,7 +4,8 @@ import { createSlice, current } from "@reduxjs/toolkit"
 
 const INITIAL_STATE = {
     carts:[],
-    totalCartsPrice:0
+    totalCartsPrice:0,
+    IsPurchased:false
 }
 
 
@@ -64,7 +65,14 @@ const cartsSlice = createSlice({
 
             state.carts.splice(ind,1);
             cartsSlice.caseReducers.totalCartItemPrice(state,action);
-        }
+        },
+        emptyState:(state,action) => {
+            state.carts = [];
+            state.totalCartsPrice = 0
+        },
+        prodPurchased:(state,action) => {
+         state.IsPurchased = true;
+        } 
 
 
     }

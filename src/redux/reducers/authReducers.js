@@ -23,6 +23,6 @@ const authSlice = createSlice({
 })
 
 export const authActions = authSlice.actions;
-export const authReducers = authSlice.reducer;
+export const authReducer = authSlice.reducer;
 
-export const authSelector = (state) => state.authReducers;
+export const authSelector = (state) => state.authReducer;

@@ -31,7 +31,7 @@ const SignUp = () => {
         })
         
        
-            localStorage.setItem('name',nameRef.current.value);
+            
             emailRef.current.value = "";
             nameRef.current.value = "";
             passwordRef.current.value = "";

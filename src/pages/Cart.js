@@ -1,29 +1,134 @@
 import { useDispatch, useSelector } from "react-redux";
 import { cartActions, cartSelector } from "../redux/reducers/cartReducers";
 import styles from "../components/Home/Home.module.css";
+import Spinner from "react-spinner-material";
 import {
   doc,
   updateDoc,
   deleteField,
   getDocs,
   collection,
-  deleteDoc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseInit";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { homeSelector } from "../redux/reducers/homeReducers";
+
+import { orderActions, orderSelector } from "../redux/reducers/orderReducers";
 
 const Cart = () => {
-  const { carts, totalCartsPrice } = useSelector(cartSelector);
-const dispatch = useDispatch();
-
-
+  let { carts, totalCartsPrice, IsPurchased } = useSelector(cartSelector);
+  let { ordersArr, dayArr } = useSelector(orderSelector);
+  const dispatch = useDispatch();
   let auth = sessionStorage.getItem("email");
-  
-  if(!auth) {
-    return <Navigate to ='/signin' replace = {true} />
-  }
+  const navigate = useNavigate();
+  let [loading, setLoading] = useState(false);
+
+  console.log("auth cart", auth);
+
+  let d = new Date();
+  let str = JSON.stringify(d);
+  let currDay = str.substring(1, 11).split("-").reverse().join("-");
+
+  const getCartsProd = async () => {
+    setLoading(true);
+    const email = sessionStorage.getItem("email");
+    const querySnapshot = await getDocs(
+      collection(db, "users", email, "carts")
+    );
+
+    let arr = [];
+    let price = 0;
+    querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      if (Object.keys(data).length > 0) {
+        price += data.price * data.qty;
+        arr.push(data);
+      }
+    });
+
+    dispatch(cartActions.setupInitializeCart([arr, price]));
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (auth) getCartsProd();
+  }, []);
+
+  const addOrdersToDB = async () => {
+    IsPurchased = true;
+    await setDoc(doc(db, "users", auth, "orders", currDay), {
+      id: currDay,
+    });
+
+    carts.map(async (item) => {
+      let indArr = ordersArr.map((arr) =>
+        arr.findIndex((prod) => prod.id === item.id)
+      );
+
+      if (
+        dayArr[dayArr.length - 1] === currDay &&
+        indArr[indArr.length - 1] !== -1
+      ) {
+        const docRef = doc(
+          db,
+          "users",
+          auth,
+          "orders",
+          currDay,
+          "orderList",
+          item.id
+        );
+        await updateDoc(docRef, {
+          qty:
+            ordersArr[ordersArr.length - 1][indArr[indArr.length - 1]].qty +
+            item.qty,
+          totalPrice:
+            ordersArr[ordersArr.length - 1][indArr[indArr.length - 1]]
+              .totalPrice + item.price,
+        });
+      } else {
+        await setDoc(
+          doc(db, "users", auth, "orders", currDay, "orderList", item.id),
+          {
+            name: item.name,
+            price: item.price,
+            qty: item.qty,
+            totalPrice: item.price * item.qty,
+            id: item.id,
+          }
+        );
+      }
+    });
+
+    const querySnapshot = await getDocs(collection(db, "users", auth, "carts"));
+
+    querySnapshot.docs.map(async (item) => {
+      let data = item.data();
+      if (Object.keys(data).length > 0) {
+        const itemRef = doc(db, "users", auth, "carts", data.id);
+
+        // Remove the 'all prod ' field from the document
+        await updateDoc(itemRef, {
+          name: deleteField(),
+          icon: deleteField(),
+          price: deleteField(),
+          qty: deleteField(),
+          category: deleteField(),
+          id: deleteField(),
+        });
+      }
+    });
+
+    if (IsPurchased) {
+      dispatch(orderActions.emptyCurrOrderArr());
+    }
+    dispatch(cartActions.emptyState());
+    setTimeout(() => {
+      navigate("/order");
+    }, 1000);
+  };
 
   const incrementQtyToDB = async (id) => {
     dispatch(cartActions.incrementProdCnt(id));
@@ -61,12 +166,10 @@ const dispatch = useDispatch();
   };
 
   const removeCartItemFromDB = async (id) => {
-    console.log("id", typeof id);
     let email = sessionStorage.getItem("email");
 
     const itemRef = doc(db, "users", email, "carts", id);
 
-    console.log("ref", itemRef);
     // Remove the 'all prod ' field from the document
     await updateDoc(itemRef, {
       name: deleteField(),
@@ -79,31 +182,13 @@ const dispatch = useDispatch();
     dispatch(cartActions.removeCartItem(id));
   };
 
-  const getCartsProd = async () => {
-    const email = sessionStorage.getItem("email");
-    const querySnapshot = await getDocs(
-      collection(db, "users", email, "carts")
+  if (loading) {
+    return (
+      <div className={styles.loader}>
+        <Spinner color={"#7064e5"} />
+      </div>
     );
-
-    let arr = [];
-    let price = 0;
-    querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-
-      if (Object.keys(data).length > 0) {
-        price += data.price * data.qty;
-        arr.push(data);
-      }
-    });
-
-    dispatch(cartActions.setupInitializeCart([arr, price]));
-  };
-
-  useEffect(() => {
-    if(auth)
-     getCartsProd();
-  }, []);
-
+  }
   return (
     <>
       <>
@@ -114,7 +199,7 @@ const dispatch = useDispatch();
                 Total Price:- <span>&#8377; {totalCartsPrice} </span>
                 /-
               </h3>
-              <button>Purchase</button>
+              <button onClick={() => addOrdersToDB()}>Purchase</button>
             </div>
             <div className={styles.productCont}>
               {carts.map((item) => (
