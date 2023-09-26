@@ -1,59 +1,80 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 import styles from "./SignIn.module.css";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRef } from "react";
-import { authActions,authSelector } from "../redux/reducers/authReducers";
-import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 
 const SignIn = () => {
-   const emailRef = useRef();
-   const passwordRef = useRef();
-   
-   //authAction creators 
-  
-   const dispatch = useDispatch();
-   const navigate = useNavigate();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const navigate = useNavigate();
 
- 
+  //authAction creators
 
-
+ // handleSignIn method is used to handle the sign functionality
   const handleSignIn = (e) => {
     e.preventDefault();
+
+    try {
+      if (emailRef.current.value && passwordRef.current.value)
+        e.target.innerText = "...";
+      setTimeout(() => {
+        const auth = getAuth();
+
+        signInWithEmailAndPassword(
+          auth,
+          emailRef.current.value,
+          passwordRef.current.value
+        )
+          .then((userCredential) => {
+            // Signed in
+
+            sessionStorage.setItem("email", emailRef.current.value);
+
+            emailRef.current.value = "";
+            passwordRef.current.value = "";
+            e.target.innerText = "Sign In";
+            toast.success("Login Successfully!!");
+
+            navigate("/");
+          })
+          .catch((error) => {
+            e.target.innerText = "Sign In";
+            const errorCode = error.code;
+            
+
+            if (errorCode === "auth/user-not-found") {
+              toast.error("Please check your Email!");
+            } else if (errorCode === "auth/wrong-password") {
+              toast.error("Password is Wrong!");
+            }
+          });
+      }, 1000);
+    } catch (error) {
     
-    if(emailRef.current.value && passwordRef.current.value)
-     e.target.innerText = "...";
-    setTimeout(() => {
-      const auth = getAuth();
-     
-    signInWithEmailAndPassword(auth, emailRef.current.value, passwordRef.current.value)
-      .then((userCredential) => {
-        // Signed in
-        
-         
-        sessionStorage.setItem("email",emailRef.current.value);
-       
-        emailRef.current.value = "";
-        passwordRef.current.value = "";
-        e.target.innerText = "Sign In";
-        navigate('/');
-        
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
-    }, 1000);
+      toast.error(error.code);
+    }
   };
 
   return (
     <>
       <div className={styles.signInCont}>
         <h2>Sign In</h2>
-        <form className={styles.signInForm} >
-          <input type="email" ref={emailRef} placeholder="Enter Email" required/>
+        <form className={styles.signInForm}>
+          <input
+            type="email"
+            ref={emailRef}
+            placeholder="Enter Email"
+            required
+          />
           <br />
-          <input type="password" ref={passwordRef} placeholder="Enter Password" required/>
+          <input
+            type="password"
+            ref={passwordRef}
+            placeholder="Enter Password"
+            required
+          />
           <br />
           <button onClick={(e) => handleSignIn(e)}>Sign in</button>
         </form>

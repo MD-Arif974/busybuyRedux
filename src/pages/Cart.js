@@ -1,7 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
-import { cartActions, cartSelector } from "../redux/reducers/cartReducers";
 import styles from "../components/Home/Home.module.css";
 import Spinner from "react-spinner-material";
+import { db } from "../firebaseInit";
+import { useEffect, useState } from "react";
+import {useNavigate } from "react-router-dom";
+
+
+// redux reducers
+import { orderActions, orderSelector } from "../redux/reducers/orderReducers";
+import { cartActions, cartSelector } from "../redux/reducers/cartReducers";
+
+
+
+//firebase methods
 import {
   doc,
   updateDoc,
@@ -10,11 +21,10 @@ import {
   collection,
   setDoc,
 } from "firebase/firestore";
-import { db } from "../firebaseInit";
-import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
 
-import { orderActions, orderSelector } from "../redux/reducers/orderReducers";
+
+
+
 
 const Cart = () => {
   let { carts, totalCartsPrice, IsPurchased } = useSelector(cartSelector);
@@ -24,12 +34,14 @@ const Cart = () => {
   const navigate = useNavigate();
   let [loading, setLoading] = useState(false);
 
-  console.log("auth cart", auth);
-
+ 
+  // this is to get current date
   let d = new Date();
   let str = JSON.stringify(d);
   let currDay = str.substring(1, 11).split("-").reverse().join("-");
+  
 
+  // getCartsProd methods is used to get the all producst to carts arr from db
   const getCartsProd = async () => {
     setLoading(true);
     const email = sessionStorage.getItem("email");
@@ -46,6 +58,7 @@ const Cart = () => {
         price += data.price * data.qty;
         arr.push(data);
       }
+      return data;
     });
 
     dispatch(cartActions.setupInitializeCart([arr, price]));
@@ -54,8 +67,11 @@ const Cart = () => {
 
   useEffect(() => {
     if (auth) getCartsProd();
-  }, []);
+  }, [auth]);
 
+
+
+  //addOrdersToDb  methods is used to add all the order once we purchased and remove all the products from carts.
   const addOrdersToDB = async () => {
     IsPurchased = true;
     await setDoc(doc(db, "users", auth, "orders", currDay), {
@@ -101,7 +117,8 @@ const Cart = () => {
         );
       }
     });
-
+    
+    // this getdocs is used to remove all the carts items from carts collection in db
     const querySnapshot = await getDocs(collection(db, "users", auth, "carts"));
 
     querySnapshot.docs.map(async (item) => {
@@ -130,6 +147,8 @@ const Cart = () => {
     }, 1000);
   };
 
+
+  // incrementQtyToDb method is used to increment the cnt of product in cart arr as well as in db
   const incrementQtyToDB = async (id) => {
     dispatch(cartActions.incrementProdCnt(id));
     let email = sessionStorage.getItem("email");
@@ -139,6 +158,8 @@ const Cart = () => {
       qty: carts[ind].qty + 1,
     });
   };
+
+  // decrementQtyToDB method is used to decrement the cnt of product in cart arr as well as in db
   const decrementQtyToDB = async (id) => {
     let email = sessionStorage.getItem("email");
     const cartsProdRef = doc(db, "users", email, "carts", id);
@@ -165,6 +186,8 @@ const Cart = () => {
     dispatch(cartActions.decrementProdCnt(id));
   };
 
+
+  // removeCartItemFromDb method is used to remove the product from cart after clicking on remove button as well as from db
   const removeCartItemFromDB = async (id) => {
     let email = sessionStorage.getItem("email");
 

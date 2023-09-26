@@ -1,4 +1,4 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 
 const INITIAL_STATE = {
@@ -33,7 +33,8 @@ const INITIAL_STATE = {
   arr: [],
   filterProdName:"",
   filterRangeValue:0,
-  filterArr:[]
+  filterArr:[],
+  userClicked:false
 };
 
 const homeSlice = createSlice({
@@ -98,6 +99,15 @@ const homeSlice = createSlice({
 
          }
         
+    },
+    showLogOutButton:(state,action) =>{
+     
+       if(action.payload === undefined) {
+        state.userClicked = !state.userClicked;
+       }
+       else{
+          state.userClicked = false;
+       }
     }
   },
 });

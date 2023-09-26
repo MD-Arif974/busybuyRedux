@@ -1,4 +1,4 @@
-import { db } from "./firebaseInit";
+
 import Navbar from "./components/Navbar/Navbar";
 import Order from "./pages/Order";
 import Cart from "./pages/Cart";
@@ -24,7 +24,7 @@ function App() {
   
 
   let auth = sessionStorage.getItem("email");
-  console.log("app auth",auth);
+ 
   const router = createBrowserRouter([
     {
       path: "/",

@@ -5,11 +5,13 @@ import { cartReducer } from '../redux/reducers/cartReducers';
 import { orderReducer } from '../redux/reducers/orderReducers';
 
 
+
 export const store = configureStore({
    reducer:{
       homeReducer,
       authReducer,
       cartReducer,
-      orderReducer
+      orderReducer,
+      
    }
 });

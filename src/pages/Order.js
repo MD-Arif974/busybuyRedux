@@ -1,18 +1,24 @@
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./Orders.module.css";
-import { orderActions, orderSelector } from "../redux/reducers/orderReducers";
+
 import { useEffect ,useState} from "react";
+import Spinner from "react-spinner-material";
+
+//firebase methods
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseInit";
-import Spinner from "react-spinner-material";
+
+// redux reducers
+import { orderActions, orderSelector } from "../redux/reducers/orderReducers";
 
 const Order = () => {
   const { ordersArr, totalOrderPriceArr, dayArr } = useSelector(orderSelector);
-
   const dispatch = useDispatch();
   const email = sessionStorage.getItem("email");
   let [loading, setLoading] = useState(false);
 
+ 
+  // getOrders method is used to get orders from db once it is mounted
   const getOrders = async () => {
     setLoading(true);
     const querySnapshot = await getDocs(
@@ -33,6 +39,7 @@ const Order = () => {
         let item = prod.data();
         totalPrice += item.price * item.qty;
         currArr.push(item);
+        return totalPrice;
       });
 
       if (currArr.length > 0) {
@@ -50,9 +57,10 @@ const Order = () => {
 
   useEffect(() => {
     if (email && ordersArr.length === 0) {
+      console.log("lll");
       getOrders();
     }
-  }, []);
+  }, [email,ordersArr]);
 
   if (loading) {
     return (
